@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Paper, TextField, Button, Typography } from "@material-ui/core";
 import FileBase from "react-file-base64";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import useStyles from "./styles";
 
-import { createPost } from "../../actions/posts";
+import { createPost, updatePost } from "../../actions/posts";
 
-const Form = () => {
+const Form = ({ currentId, setCurrentId }) => {
   const classes = useStyles();
 
   const dispatch = useDispatch();
+
+  // just find the post if the currentID exist in state
+  // fetch a single post
+  const post = useSelector((state) =>
+    currentId ? state.posts.find((p) => p._id === currentId) : null
+  );
 
   const [postData, setPostData] = useState({
     creator: "",
@@ -20,6 +26,10 @@ const Form = () => {
     selectedFile: "",
   });
 
+  useEffect(() => {
+    if (post) setPostData(post);
+  }, [post]);
+
   const handleChange = (e) => {
     setPostData({ ...postData, [e.target.name]: e.target.value });
   };
@@ -27,10 +37,25 @@ const Form = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    dispatch(createPost(postData));
+    if (!currentId) {
+      dispatch(createPost(postData));
+      clear();
+    } else {
+      dispatch(updatePost(currentId, postData));
+      clear();
+    }
   };
 
-  const clearInput = () => {};
+  const clear = () => {
+    setCurrentId(null);
+    setPostData({
+      creator: "",
+      title: "",
+      message: "",
+      tags: "",
+      selectedFile: "",
+    });
+  };
 
   return (
     <Paper className={classes.paper}>
@@ -40,7 +65,9 @@ const Form = () => {
         className={`${classes.root} ${classes.form}`}
         onSubmit={handleSubmit}
       >
-        <Typography variant='h6'>Creating a Memory</Typography>
+        <Typography variant='h6'>
+          {currentId ? "Editing" : "Creating"} a Memory
+        </Typography>
         <TextField
           fullWidth
           variant='outlined'
@@ -94,14 +121,14 @@ const Form = () => {
           fullWidth
           className={classes.buttonSubmit}
         >
-          Submit
+          {currentId ? "Edit" : "Create"}
         </Button>
         <Button
           type='button'
           variant='contained'
           color='secondary'
           size='small'
-          onClick={clearInput}
+          onClick={clear}
           fullWidth
         >
           Clear
