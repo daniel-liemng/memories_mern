@@ -17,7 +17,7 @@ const reducer = (posts = [], action) => {
         post._id === action.payload._id ? action.payload : post
       );
     case DELETE:
-      return { ...posts };
+      return posts.filter((p) => p._id !== action.payload);
     case LIKE:
       return { ...posts };
     default:
