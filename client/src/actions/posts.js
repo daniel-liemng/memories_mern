@@ -50,4 +50,15 @@ const deletePost = (id) => async (dispatch) => {
   }
 };
 
-export { getPosts, createPost, updatePost, deletePost };
+const likePost = (id) => async (dispatch) => {
+  console.log("liek");
+  try {
+    const { data } = await api.likePost(id);
+
+    dispatch({ type: LIKE, payload: data });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { getPosts, createPost, updatePost, deletePost, likePost };
