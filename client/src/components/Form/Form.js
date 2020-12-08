@@ -102,7 +102,9 @@ const Form = ({ currentId, setCurrentId }) => {
           label='Tags'
           name='tags'
           value={postData.tags}
-          onChange={handleChange}
+          onChange={(e) =>
+            setPostData({ ...postData, tags: e.target.value.split(",") })
+          }
         />
         <div className={classes.fileInput}>
           <FileBase
